@@ -60,8 +60,14 @@ const Chat: React.FC = () => {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg-primary">
       <div className="flex h-full w-full max-w-[1920px] mx-auto overflow-hidden">
-        <Sidebar users={users} loading={loading} onLogout={handleLogout} />
-        <main className="flex-1 overflow-hidden">
+        <div
+          className={`h-full w-full lg:w-80 ${selectedUser ? "hidden lg:block" : "block"}`}
+        >
+          <Sidebar users={users} loading={loading} onLogout={handleLogout} />
+        </div>
+        <main
+          className={`flex-1 overflow-hidden h-full ${selectedUser ? "block" : "hidden lg:block"}`}
+        >
           <ChatWindow selectedUser={selectedUser} />
         </main>
       </div>

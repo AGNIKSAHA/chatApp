@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ users, loading, onLogout }) => {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col border-r border-border-primary bg-bg-secondary lg:w-80">
+    <div className="flex h-screen w-full flex-col border-r border-border-primary bg-bg-secondary">
       <div className="border-b border-border-primary p-6">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ users, loading, onLogout }) => {
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-bg-secondary bg-success"></div>
             </div>
-            <div className="hidden flex-col lg:flex">
+            <div className="flex flex-col">
               <span className="max-w-[120px] truncate text-sm font-bold text-text-primary">
                 {currentUser?.username}
               </span>
@@ -123,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ users, loading, onLogout }) => {
                     }`}
                   ></div>
                 </div>
-                <div className="hidden flex-1 overflow-hidden lg:block">
+                <div className="flex-1 overflow-hidden">
                   <h5
                     className={`truncate text-sm font-semibold transition-colors ${
                       selectedUser?.id === user.id

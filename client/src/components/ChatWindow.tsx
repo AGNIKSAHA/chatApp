@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useRef, FormEvent } from "react";
-import { Send, Smile, Info, MoreVertical, MessageSquare } from "lucide-react";
+import {
+  Send,
+  Smile,
+  Info,
+  MoreVertical,
+  MessageSquare,
+  ArrowLeft,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { setMessages } from "../store/slices/chatSlice";
+import { setMessages, setSelectedUser } from "../store/slices/chatSlice";
 import { getSocket } from "../lib/socket";
 import { api } from "../lib/axios";
 import { User, Message } from "../types";
@@ -160,10 +167,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ selectedUser }) => {
   return (
     <div className="flex h-screen w-full flex-col bg-bg-primary">
       {/* Header */}
-      <div className="flex flex-shrink-0 items-center justify-between border-b border-border-primary bg-bg-secondary/50 px-6 py-4 backdrop-blur-md">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-shrink-0 items-center justify-between border-b border-border-primary bg-bg-secondary/50 px-4 py-4 backdrop-blur-md lg:px-6">
+        <div className="flex items-center gap-2 lg:gap-4">
+          <button
+            onClick={() => dispatch(setSelectedUser(null))}
+            className="rounded-full p-2 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-primary lg:hidden"
+          >
+            <ArrowLeft size={20} />
+          </button>
           <div className="relative">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-dark text-lg font-bold text-white shadow-lg">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-dark text-base font-bold text-white shadow-lg lg:h-12 lg:w-12 lg:text-lg">
               {getInitials(selectedUser.username)}
             </div>
             <div
