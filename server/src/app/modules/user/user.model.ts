@@ -42,6 +42,8 @@ const userSchema = new Schema<IUser>(
     },
     verificationToken: String,
     verificationTokenExpires: Date,
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
   {
     timestamps: true,

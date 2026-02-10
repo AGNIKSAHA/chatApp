@@ -126,6 +126,92 @@ export const verifyEmail = async (
   });
 };
 
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new AppError(400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    // Return 200 to avoid email harvesting
+    res.json({
+      message:
+        "If an account with that email exists, a reset link has been sent.",
+    });
+    return;
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetTokenExpires = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
+
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpires = resetTokenExpires;
+  await user.save();
+
+  const resetUrl = `${env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+  try {
+    await sendEmail({
+      to: email,
+      subject: "Reset your password",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1>Password Reset</h1>
+          <p>You requested a password reset. Please click the link below to reset your password:</p>
+          <div style="margin: 20px 0;">
+            <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a>
+          </div>
+          <p>Alternatively, copy and paste this link into your browser:</p>
+          <p>${resetUrl}</p>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send reset email:", error);
+    throw new AppError(500, "Failed to send reset email");
+  }
+
+  res.json({ message: "Reset link sent to your email" });
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    throw new AppError(400, "Token and password are required");
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new AppError(400, "Invalid or expired reset token");
+  }
+
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({
+    message:
+      "Password reset successfully. You can now login with your new password.",
+  });
+};
+
 export const refreshToken = async (
   req: Request,
   res: Response,

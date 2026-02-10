@@ -7,6 +7,8 @@ import {
   getAllUsers,
   verifyEmail,
   refreshToken,
+  forgotPassword,
+  resetPassword,
 } from "./user.controller";
 import { validate } from "../../common/middlewares/validate.middleware";
 import { authMiddleware } from "../../common/middlewares/auth.middleware";
@@ -32,6 +34,18 @@ router.post(
 router.post("/auth/refresh", catchAsync(refreshToken));
 
 router.get("/auth/verify-email", authRateLimiter, catchAsync(verifyEmail));
+router.post(
+  "/auth/forgot-password",
+  authRateLimiter,
+  validate(userValidation.forgotPassword),
+  catchAsync(forgotPassword),
+);
+router.post(
+  "/auth/reset-password",
+  authRateLimiter,
+  validate(userValidation.resetPassword),
+  catchAsync(resetPassword),
+);
 
 // Protected routes
 router.get("/auth/profile", authMiddleware, catchAsync(getProfile));
