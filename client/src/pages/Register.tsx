@@ -8,6 +8,7 @@ import { api } from "../lib/axios";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../store/slices/authSlice";
 import { initializeSocket } from "../lib/socket";
+import { AuthResponse } from "../types";
 
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(30),
@@ -36,10 +37,18 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await api.post<any>("/auth/signup", data);
+      const response = await api.post<AuthResponse>("/auth/signup", data);
       const { user } = response.data;
 
-      dispatch(setCredentials({ user }));
+      dispatch(
+        setCredentials({
+          user: {
+            ...user,
+            isOnline: user.isOnline ?? true,
+            lastSeen: new Date(),
+          },
+        }),
+      );
       initializeSocket();
       navigate("/chat");
     } catch (err: unknown) {

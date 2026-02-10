@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, FormEvent } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Send,
   Smile,
@@ -84,8 +84,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ selectedUser }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
+  const handleSendMessage = (e?: React.FormEvent): void => {
+    e?.preventDefault();
 
     if (!messageInput.trim() || !selectedUser) return;
 
@@ -326,7 +326,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ selectedUser }) => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleSendMessage(e as any);
+                  handleSendMessage();
                 }
               }}
               onBlur={handleStopTyping}
