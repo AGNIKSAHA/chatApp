@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { api } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const resetPasswordSchema = z
   .object({
@@ -29,7 +30,6 @@ const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const token = searchParams.get("token");
 
-  const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -43,11 +43,10 @@ const ResetPassword: React.FC = () => {
 
   const onSubmit = async (data: ResetPasswordFormValues): Promise<void> => {
     if (!token) {
-      setError("Invalid or missing reset token");
+      toast.error("Invalid or missing reset token");
       return;
     }
 
-    setError("");
     setLoading(true);
 
     try {
@@ -56,14 +55,15 @@ const ResetPassword: React.FC = () => {
         password: data.password,
       });
       setSuccess(true);
+      toast.success("Password updated successfully!");
       // Automatically redirect after 3 seconds
       setTimeout(() => navigate("/login"), 3000);
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const error = err as { response?: { data?: { error?: string } } };
-        setError(error.response?.data?.error || "Reset failed");
+        toast.error(error.response?.data?.error || "Reset failed");
       } else {
-        setError("Failed to reset password");
+        toast.error("Failed to reset password");
       }
     } finally {
       setLoading(false);
@@ -106,13 +106,6 @@ const ResetPassword: React.FC = () => {
             Enter your new password below.
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg bg-danger/10 p-4 text-danger animate-fadeIn">
-            <AlertCircle size={20} />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
 
         {success ? (
           <div className="text-center animate-fadeIn">

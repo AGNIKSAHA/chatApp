@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { store } from "./store/store.ts";
 import { queryClient } from "./lib/queryClient.ts";
 import App from "./App.tsx";
+import { Toaster } from "react-hot-toast";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
@@ -19,6 +20,7 @@ ReactDOM.createRoot(rootElement).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <App />
+        <Toaster position="top-center" reverseOrder={false} />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </Provider>

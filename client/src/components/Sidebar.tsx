@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ users, loading, onLogout }) => {
   const currentUser = useAppSelector((state) => state.auth.user);
   const selectedUser = useAppSelector((state) => state.chat.selectedUser);
   const onlineUsers = useAppSelector((state) => state.chat.onlineUsers);
+  const unreadCounts = useAppSelector((state) => state.chat.unreadCounts);
 
   const getInitials = (username: string): string => {
     return username.substring(0, 2).toUpperCase();
@@ -133,13 +134,20 @@ const Sidebar: React.FC<SidebarProps> = ({ users, loading, onLogout }) => {
                   >
                     {user.username}
                   </h5>
-                  <p className="truncate text-xs text-text-tertiary">
-                    {isUserOnline(user.id) ? (
-                      <span className="text-success">Online</span>
-                    ) : (
-                      "Offline"
+                  <div className="flex items-center justify-between">
+                    <p className="truncate text-xs text-text-tertiary">
+                      {isUserOnline(user.id) ? (
+                        <span className="text-success">Online</span>
+                      ) : (
+                        "Offline"
+                      )}
+                    </p>
+                    {unreadCounts[user.id] > 0 && (
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm animate-pulse">
+                        {unreadCounts[user.id]}
+                      </span>
                     )}
-                  </p>
+                  </div>
                 </div>
               </div>
             ))}

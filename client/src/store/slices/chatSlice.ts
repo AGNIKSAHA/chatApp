@@ -6,6 +6,7 @@ interface ChatState {
   messages: Record<string, Message[]>;
   typingUsers: string[];
   onlineUsers: string[];
+  unreadCounts: Record<string, number>;
 }
 
 const initialState: ChatState = {
@@ -13,6 +14,7 @@ const initialState: ChatState = {
   messages: {},
   typingUsers: [],
   onlineUsers: [],
+  unreadCounts: {},
 };
 
 const chatSlice = createSlice({
@@ -21,6 +23,9 @@ const chatSlice = createSlice({
   reducers: {
     setSelectedUser: (state, action: PayloadAction<User | null>) => {
       state.selectedUser = action.payload;
+      if (action.payload) {
+        state.unreadCounts[action.payload.id] = 0;
+      }
     },
     setMessages: (
       state,
@@ -37,6 +42,14 @@ const chatSlice = createSlice({
         state.messages[userId] = [];
       }
       state.messages[userId].push(message);
+    },
+    incrementUnreadCount: (state, action: PayloadAction<string>) => {
+      const userId = action.payload;
+      if (state.selectedUser?.id === userId) return;
+      state.unreadCounts[userId] = (state.unreadCounts[userId] || 0) + 1;
+    },
+    clearUnreadCount: (state, action: PayloadAction<string>) => {
+      state.unreadCounts[action.payload] = 0;
     },
     setTypingUser: (
       state,
@@ -76,6 +89,7 @@ const chatSlice = createSlice({
       state.messages = {};
       state.typingUsers = [];
       state.onlineUsers = [];
+      state.unreadCounts = {};
     },
   },
   extraReducers: (builder) => {
@@ -84,12 +98,14 @@ const chatSlice = createSlice({
       state.messages = {};
       state.typingUsers = [];
       state.onlineUsers = [];
+      state.unreadCounts = {};
     });
     builder.addCase("auth/setCredentials", (state) => {
       state.selectedUser = null;
       state.messages = {};
       state.typingUsers = [];
       state.onlineUsers = [];
+      state.unreadCounts = {};
     });
   },
 });
@@ -98,6 +114,8 @@ export const {
   setSelectedUser,
   setMessages,
   addMessage,
+  incrementUnreadCount,
+  clearUnreadCount,
   setTypingUser,
   setUserOnline,
   setOnlineUsers,

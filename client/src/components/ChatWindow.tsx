@@ -12,6 +12,7 @@ import { setMessages, setSelectedUser } from "../store/slices/chatSlice";
 import { getSocket } from "../lib/socket";
 import { api } from "../lib/axios";
 import { User, Message } from "../types";
+import toast from "react-hot-toast";
 import { formatDistanceToNow } from "date-fns";
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 import { EmojiClickData, Theme } from "emoji-picker-react";
@@ -75,6 +76,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ selectedUser }) => {
       );
     } catch (error) {
       console.error("Failed to fetch messages:", error);
+      toast.error("Failed to load messages");
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle2, XCircle, Loader2, Mail } from "lucide-react";
 import { api } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +26,7 @@ const VerifyEmail: React.FC = () => {
         await api.get(`/auth/verify-email?token=${token}`);
         setStatus("success");
         setMessage("Email verified successfully! Redirecting to login...");
+        toast.success("Email verified!");
         setTimeout(() => {
           navigate("/login");
         }, 3000);
@@ -40,6 +42,7 @@ const VerifyEmail: React.FC = () => {
           }
         }
         setMessage(errorMessage);
+        toast.error(errorMessage);
       }
     };
 

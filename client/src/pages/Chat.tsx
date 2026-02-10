@@ -9,6 +9,7 @@ import { api } from "../lib/axios.ts";
 import Sidebar from "../components/Sidebar.tsx";
 import ChatWindow from "../components/ChatWindow.tsx";
 import { User } from "../types/index.ts";
+import toast from "react-hot-toast";
 
 const Chat: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ const Chat: React.FC = () => {
       setUsers(response.data.users);
     } catch (error) {
       console.error("Failed to fetch users:", error);
+      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -49,6 +51,7 @@ const Chat: React.FC = () => {
       disconnectSocket();
       dispatch(logout());
       dispatch(clearChat());
+      toast.success("Logged out successfully");
       navigate("/login");
     }
   };

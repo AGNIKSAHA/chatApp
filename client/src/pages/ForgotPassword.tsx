@@ -3,14 +3,9 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  KeyRound,
-  Mail,
-  AlertCircle,
-  CheckCircle2,
-  ArrowLeft,
-} from "lucide-react";
+import { KeyRound, Mail, CheckCircle2, ArrowLeft } from "lucide-react";
 import { api } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -19,7 +14,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPassword: React.FC = () => {
-  const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -32,18 +26,18 @@ const ForgotPassword: React.FC = () => {
   });
 
   const onSubmit = async (data: ForgotPasswordFormValues): Promise<void> => {
-    setError("");
     setLoading(true);
 
     try {
       await api.post("/auth/forgot-password", data);
       setSuccess(true);
+      toast.success("Reset link sent!");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const error = err as { response?: { data?: { error?: string } } };
-        setError(error.response?.data?.error || "Something went wrong");
+        toast.error(error.response?.data?.error || "Something went wrong");
       } else {
-        setError("Failed to send reset link");
+        toast.error("Failed to send reset link");
       }
     } finally {
       setLoading(false);
@@ -64,13 +58,6 @@ const ForgotPassword: React.FC = () => {
             No worries, we'll send you reset instructions.
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg bg-danger/10 p-4 text-danger animate-fadeIn">
-            <AlertCircle size={20} />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
 
         {success ? (
           <div className="text-center animate-fadeIn">

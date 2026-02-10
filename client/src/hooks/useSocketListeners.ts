@@ -1,10 +1,15 @@
 import { useEffect } from "react";
 import { getSocket } from "../lib/socket";
+import {
+  requestNotificationPermission,
+  showNotification,
+} from "../lib/notifications";
 import { useAppSelector, useAppDispatch } from "../store/hooks.ts";
 import {
   addMessage,
   setUserOnline,
   setTypingUser,
+  incrementUnreadCount,
 } from "../store/slices/chatSlice.ts";
 import { Message } from "../types";
 
@@ -17,11 +22,25 @@ export const useSocketListeners = (): void => {
     const socket = getSocket();
     if (!socket || !user) return;
 
+    // Request notification permission
+    requestNotificationPermission();
+
     // Handle incoming messages
     const handleMessageReceive = (message: Message): void => {
       const otherUserId =
         message.sender.id === user.id ? message.receiver.id : message.sender.id;
       dispatch(addMessage({ userId: otherUserId, message }));
+
+      // Increment unread count if message is from a user who is not selected
+      if (message.sender.id !== user.id && selectedUser?.id !== otherUserId) {
+        dispatch(incrementUnreadCount(otherUserId));
+
+        // Show browser notification
+        showNotification(`New message from ${message.sender.username}`, {
+          body: message.content,
+          icon: message.sender.avatar || "/favicon.ico",
+        });
+      }
     };
 
     // Handle sent message confirmation

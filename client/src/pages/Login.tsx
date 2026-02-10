@@ -3,12 +3,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
+import { LogIn, Mail, Lock } from "lucide-react";
 import { api } from "../lib/axios";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../store/slices/authSlice";
 import { initializeSocket } from "../lib/socket";
 import { AuthResponse } from "../types";
+import toast from "react-hot-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,7 +21,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const {
@@ -32,7 +32,6 @@ const Login: React.FC = () => {
   });
 
   const onSubmit = async (data: LoginFormValues): Promise<void> => {
-    setError("");
     setLoading(true);
 
     try {
@@ -53,13 +52,14 @@ const Login: React.FC = () => {
       );
 
       initializeSocket();
+      toast.success("Welcome back!");
       navigate("/chat");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const error = err as { response?: { data?: { error?: string } } };
-        setError(error.response?.data?.error || "Login failed");
+        toast.error(error.response?.data?.error || "Login failed");
       } else {
-        setError("Login failed");
+        toast.error("Login failed");
       }
     } finally {
       setLoading(false);
@@ -80,13 +80,6 @@ const Login: React.FC = () => {
             Sign in to continue chatting
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg bg-danger/10 p-4 text-danger animate-fadeIn">
-            <AlertCircle size={20} />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
