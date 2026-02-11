@@ -3,7 +3,8 @@ import { store } from "../store/store.ts";
 import { logout } from "../store/slices/authSlice.ts";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5505/api",
+  baseURL:
+    import.meta.env.VITE_API_URL || "https://chatapp-8huj.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -23,7 +24,7 @@ api.interceptors.response.use(
       try {
         // Try to refresh the token using cookies
         await axios.post(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5505/api"}/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || "https://chatapp-8huj.onrender.com/api"}/auth/refresh`,
           {},
           { withCredentials: true },
         );
