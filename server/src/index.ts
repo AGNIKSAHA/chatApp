@@ -11,6 +11,7 @@ import routes from "./app/routes";
 import { apiRateLimiter } from "./app/common/middlewares/rateLimit.middleware";
 
 const app: Application = express();
+app.set("trust proxy", 1);
 const server = createServer(app);
 
 // Initialize Socket.IO
