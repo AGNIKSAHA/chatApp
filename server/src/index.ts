@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from "express";
+import path from "path";
 import { createServer } from "http";
 import cors from "cors";
 import helmet from "helmet";
@@ -32,10 +33,24 @@ app.use(cookieParser());
 // API Routes
 app.use("/api", apiRateLimiter, routes);
 
-// 404 handler
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: "Route not found" });
-});
+// Serve frontend in production
+if (env.NODE_ENV === "production") {
+  const clientPath = path.join(__dirname, "../../client/dist");
+  app.use(express.static(clientPath));
+
+  app.get("*", (req: Request, res: Response) => {
+    if (!req.path.startsWith("/api")) {
+      res.sendFile(path.join(clientPath, "index.html"));
+    } else {
+      res.status(404).json({ error: "API route not found" });
+    }
+  });
+} else {
+  // 404 handler for development
+  app.use((_req: Request, res: Response) => {
+    res.status(404).json({ error: "Route not found" });
+  });
+}
 
 // Error handler (must be last)
 app.use(errorHandler);
