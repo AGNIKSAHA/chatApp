@@ -88,7 +88,8 @@ const router = createBrowserRouter([
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { data: user, isSuccess, isError } = useProfile();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const { data: user, isSuccess, isError } = useProfile(isAuthenticated);
 
   useEffect(() => {
     if (isSuccess && user) {

@@ -272,6 +272,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(401, "Invalid credentials");
   }
 
+  // Check if user is verified
+  if (!user.isVerified) {
+    throw new AppError(
+      401,
+      "Please verify your email address before logging in",
+    );
+  }
+
   // Update online status
   user.isOnline = true;
   await user.save();

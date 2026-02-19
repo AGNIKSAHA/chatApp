@@ -4,7 +4,7 @@ export interface User {
   email: string;
   avatar?: string;
   isOnline: boolean;
-  lastSeen: Date;
+  lastSeen: string;
 }
 
 export interface Message {
@@ -21,7 +21,7 @@ export interface Message {
   };
   content: string;
   isRead: boolean;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface Conversation {
@@ -30,11 +30,11 @@ export interface Conversation {
     username: string;
     avatar?: string;
     isOnline: boolean;
-    lastSeen: Date;
+    lastSeen: string;
   };
   lastMessage: {
     content: string;
-    createdAt: Date;
+    createdAt: string;
     isRead: boolean;
     isSentByMe: boolean;
   };

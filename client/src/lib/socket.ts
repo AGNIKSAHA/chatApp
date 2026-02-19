@@ -1,7 +1,9 @@
 import { io, Socket } from "socket.io-client";
 
+const isDev = import.meta.env.DEV;
 const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL || "https://chatapp-8huj.onrender.com";
+  import.meta.env.VITE_SOCKET_URL ||
+  (isDev ? "http://localhost:5505" : "https://chatapp-8huj.onrender.com");
 
 let socket: Socket | null = null;
 

@@ -46,7 +46,7 @@ const Login: React.FC = () => {
             email: user.email,
             avatar: user.avatar,
             isOnline: user.isOnline || true,
-            lastSeen: new Date(),
+            lastSeen: new Date().toISOString(),
           },
         }),
       );

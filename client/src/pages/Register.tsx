@@ -5,23 +5,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { UserPlus, User, Mail, Lock } from "lucide-react";
 import { api } from "../lib/axios";
-import { useAppDispatch } from "../store/hooks";
-import { setCredentials } from "../store/slices/authSlice";
-import { initializeSocket } from "../lib/socket";
-import { AuthResponse } from "../types";
 import toast from "react-hot-toast";
 
-const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters").max(30),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+const registerSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .max(30),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(false);
 
   const {
@@ -36,21 +40,13 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await api.post<AuthResponse>("/auth/signup", data);
-      const { user } = response.data;
+      const { confirmPassword, ...signupData } = data;
+      await api.post("/auth/signup", signupData);
 
-      dispatch(
-        setCredentials({
-          user: {
-            ...user,
-            isOnline: user.isOnline ?? true,
-            lastSeen: new Date(),
-          },
-        }),
+      toast.success(
+        "Account created! Please check your email to verify your account.",
       );
-      initializeSocket();
-      toast.success("Account created! Please verify your email.");
-      navigate("/chat");
+      navigate("/login");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const error = err as {
@@ -148,6 +144,29 @@ const Register: React.FC = () => {
             {errors.password && (
               <p className="text-xs font-medium text-danger">
                 {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-text-secondary">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+                <Lock size={18} />
+              </div>
+              <input
+                {...register("confirmPassword")}
+                type="password"
+                className={`input pl-10 ${errors.confirmPassword ? "border-danger focus:ring-danger/10" : ""}`}
+                placeholder="Confirm your password"
+                disabled={loading}
+              />
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-xs font-medium text-danger">
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>
