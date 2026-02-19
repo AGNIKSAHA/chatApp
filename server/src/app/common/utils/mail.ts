@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../config/env";
 
 export interface EmailOptions {
@@ -8,49 +8,30 @@ export interface EmailOptions {
   html?: string;
 }
 
-const createTransporter = async () => {
-  // Use Ethereal for testing if no email config provided
-  if (!env.EMAIL_USER) {
-    const testAccount = await nodemailer.createTestAccount();
-    return nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
-  }
-
-  // Use configured service
-  return nodemailer.createTransport({
-    service: env.EMAIL_SERVICE || "gmail",
-    auth: {
-      user: env.EMAIL_USER,
-      pass: env.EMAIL_PASS,
-    },
-  });
-};
+const resend = new Resend(env.RESEND_API_KEY);
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
-    const transporter = await createTransporter();
+    if (!env.RESEND_API_KEY && env.NODE_ENV !== "production") {
+      console.warn("RESEND_API_KEY is not defined. Email will not be sent.");
+      console.log("Email Options:", options);
+      return;
+    }
 
-    const info = await transporter.sendMail({
-      from: `"Chat App" <${env.EMAIL_USER || "noreply@chatapp.com"}>`,
+    const { data, error } = await resend.emails.send({
+      from: `Chat App <${env.RESEND_FROM_EMAIL || "onboarding@resend.dev"}>`,
       to: options.to,
       subject: options.subject,
-      text: options.text,
-      html: options.html,
+      html: options.html || "",
+      text: options.text || "",
     });
 
-    console.log("Message sent: %s", info.messageId);
-
-    // If using Ethereal, log preview URL
-    if (!env.EMAIL_USER) {
-      console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    if (error) {
+      console.error("Resend error:", error);
+      throw new Error(`Email sending failed: ${error.message}`);
     }
+
+    console.log("Message sent:", data?.id);
   } catch (error) {
     console.error("Error sending email:", error);
     throw new Error("Email sending failed");

@@ -12,9 +12,8 @@ interface EnvConfig {
   NODE_ENV: "development" | "production" | "test";
   CLIENT_URL: string;
   MESSAGE_ENCRYPTION_KEY?: string;
-  EMAIL_SERVICE?: string;
-  EMAIL_USER?: string;
-  EMAIL_PASS?: string;
+  RESEND_API_KEY?: string;
+  RESEND_FROM_EMAIL?: string;
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -35,7 +34,6 @@ export const env: EnvConfig = {
   NODE_ENV: getEnvVariable("NODE_ENV", "development") as EnvConfig["NODE_ENV"],
   CLIENT_URL: getEnvVariable("CLIENT_URL", "http://localhost:5173"),
   MESSAGE_ENCRYPTION_KEY: process.env.MESSAGE_ENCRYPTION_KEY,
-  EMAIL_SERVICE: process.env.EMAIL_SERVICE,
-  EMAIL_USER: process.env.EMAIL_USER,
-  EMAIL_PASS: process.env.EMAIL_PASS,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
 };
