@@ -8,14 +8,29 @@ export interface EmailOptions {
   html?: string;
 }
 
-const resend = new Resend(env.RESEND_API_KEY);
+let resendInstance: Resend | null = null;
+
+const getResendInstance = () => {
+  if (!resendInstance) {
+    if (!env.RESEND_API_KEY) {
+      return null;
+    }
+    resendInstance = new Resend(env.RESEND_API_KEY);
+  }
+  return resendInstance;
+};
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
-    if (!env.RESEND_API_KEY && env.NODE_ENV !== "production") {
-      console.warn("RESEND_API_KEY is not defined. Email will not be sent.");
-      console.log("Email Options:", options);
-      return;
+    const resend = getResendInstance();
+
+    if (!resend) {
+      if (env.NODE_ENV !== "production") {
+        console.warn("RESEND_API_KEY is not defined. Email will not be sent.");
+        console.log("Email Options:", options);
+        return;
+      }
+      throw new Error("RESEND_API_KEY is missing in production");
     }
 
     const { data, error } = await resend.emails.send({
