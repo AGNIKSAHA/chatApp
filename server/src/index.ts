@@ -24,6 +24,7 @@ const allowedOrigins = [
   env.CLIENT_URL,
   "http://localhost:5173",
   "http://127.0.0.1:5173",
+  "http://localhost:4173", // Vite preview
 ];
 
 app.use(
@@ -31,12 +32,17 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
-      if (
-        allowedOrigins.indexOf(origin) !== -1 ||
-        env.NODE_ENV !== "production"
-      ) {
+
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        (env.NODE_ENV !== "production" &&
+          (origin.startsWith("http://localhost:") ||
+            origin.startsWith("http://127.0.0.1:")));
+
+      if (isAllowed) {
         callback(null, true);
       } else {
+        console.warn(`CORS blocked for origin: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },

@@ -82,6 +82,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
   };
 
   res.cookie("accessToken", accessToken, {
@@ -242,10 +243,15 @@ export const refreshToken = async (
       decoded.email,
     );
 
-    res.cookie("accessToken", newAccessToken, {
+    const cookieOptions: any = {
       httpOnly: true,
       secure: env.NODE_ENV === "production",
       sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    };
+
+    res.cookie("accessToken", newAccessToken, {
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
@@ -299,6 +305,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
   };
 
   res.cookie("accessToken", accessToken, {
@@ -355,6 +362,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
   };
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);

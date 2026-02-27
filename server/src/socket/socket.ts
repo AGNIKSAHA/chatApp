@@ -34,6 +34,9 @@ export const initializeSocket = (server: HTTPServer): Server => {
     try {
       const cookieHeader = socket.handshake.headers.cookie;
       if (!cookieHeader) {
+        console.warn(
+          `Socket connection from ${socket.id} failed: No cookies provided`,
+        );
         return next(new Error("Authentication error: No cookies provided"));
       }
 
@@ -48,6 +51,9 @@ export const initializeSocket = (server: HTTPServer): Server => {
       const token = cookies["accessToken"];
 
       if (!token) {
+        console.warn(
+          `Socket connection from ${socket.id} failed: accessToken cookie not found`,
+        );
         return next(new Error("Authentication error: No token provided"));
       }
 
@@ -55,6 +61,7 @@ export const initializeSocket = (server: HTTPServer): Server => {
       socket.userId = new mongoose.Types.ObjectId(decoded.userId);
       next();
     } catch (error) {
+      console.warn(`Socket connection from ${socket.id} failed: Invalid token`);
       next(new Error("Authentication error: Invalid token"));
     }
   });
