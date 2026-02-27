@@ -138,7 +138,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ selectedUser }) => {
     return username.substring(0, 2).toUpperCase();
   };
 
-  const formatTime = (date: Date): string => {
+  const formatTime = (date: Date | string): string => {
     return formatDistanceToNow(new Date(date), { addSuffix: true });
   };
 
